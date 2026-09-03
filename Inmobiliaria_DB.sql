@@ -119,3 +119,36 @@ CREATE TABLE reportes_pagos_pendientes (
     deuda_pendiente DECIMAL(12,2) NOT NULL,
     CONSTRAINT fk_reporte_contrato FOREIGN KEY (id_contrato) REFERENCES contratos(id_contrato)
 );
+
+
+-- ---------------------------------------------------------------------
+-- DATOS DE PRUEBAS
+-- ---------------------------------------------------------------------
+ 
+INSERT INTO tipos_propiedad (nombre_tipo) VALUES ('Casa'), ('Apartamento'), ('Local comercial');
+ 
+INSERT INTO agentes (nombre, documento, telefono, email, porcentaje_comision) VALUES
+('Juan Pérez', '1001', '3001234567', 'juan.perez@inmobiliaria.com', 3.50),
+('Laura Gómez', '1002', '3007654321', 'laura.gomez@inmobiliaria.com', 4.00);
+ 
+INSERT INTO clientes (nombre, documento, telefono, email, tipo_cliente) VALUES
+('Carlos Ramírez', '2001', '3101112233', 'carlos.ramirez@mail.com', 'comprador'),
+('Ana Torres', '2002', '3104445566', 'ana.torres@mail.com', 'arrendatario');
+ 
+INSERT INTO propiedades (id_tipo, direccion, ciudad, area_m2, precio_venta, precio_arriendo_mensual, id_agente_asignado) VALUES
+(1, 'Calle 45 #12-30', 'Bucaramanga', 180.00, 350000000.00, NULL, 1),
+(2, 'Cra 27 #10-15 Apto 402', 'Bucaramanga', 75.00, NULL, 1200000.00, 2);
+ 
+-- Al insertar este contrato de venta, el trigger trg_nuevo_contrato_auditoria
+-- marcará la propiedad 1 como 'vendida', lo que a su vez dispara
+-- trg_propiedad_cambio_estado y deja el registro en el historial.
+INSERT INTO contratos (id_propiedad, id_cliente, id_agente, tipo_contrato, fecha_inicio, valor_total) VALUES
+(1, 1, 1, 'venta', '2026-08-15', 350000000.00);
+ 
+-- Este contrato de arriendo marcará la propiedad 2 como 'arrendada'.
+INSERT INTO contratos (id_propiedad, id_cliente, id_agente, tipo_contrato, fecha_inicio, valor_total, valor_mensual) VALUES
+(2, 2, 2, 'arriendo', '2026-06-01', 1200000.00, 1200000.00);
+ 
+INSERT INTO pagos (id_contrato, fecha_pago, mes_correspondiente, valor_pagado) VALUES
+(2, '2026-06-05', '2026-06-01', 1200000.00),
+(2, '2026-07-06', '2026-07-01', 1200000.00);
